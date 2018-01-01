@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 
-public class RushHour {
+public class State {
 
 	@SuppressWarnings("serial")
 	class Intersection extends Exception{
@@ -18,7 +18,7 @@ public class RushHour {
 	LinkedList<Vehicule> vehicules;
 
 
-	public RushHour(File f) {
+	public State(File f) {
 
 		//reads the file and checks for intersections
 		LinkedList<Vehicule> vehicules = new LinkedList<Vehicule>();
