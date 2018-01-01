@@ -7,7 +7,7 @@ public class RushHour {
 	@SuppressWarnings("serial")
 	class Intersection extends Exception{
 		Intersection(){
-			System.out.println("Le fichier donné en entée est incorrect, il y a intersection des véhicules.");
+			System.out.println("Le fichier donné en entrée est incorrect, il y a intersection des véhicules.");
 		}
 	}
 
@@ -19,6 +19,8 @@ public class RushHour {
 
 
 	public RushHour(File f) {
+
+		//reads the file and checks for intersections
 		LinkedList<Vehicule> vehicules = new LinkedList<Vehicule>();
 		BufferedReader br;
 		try {
@@ -27,13 +29,13 @@ public class RushHour {
 			String num = br.readLine();
 			String vehicule;
 			while ((vehicule = br.readLine()) != null) {
-				process(vehicules, vehicule);
+				append(vehicules, vehicule);
 			}
 			this.vehicules = vehicules;
 			this.gridSize = Integer.parseInt(size);
 			this.num = Integer.parseInt(num);
-			/*On ajoute un test d'intersection qui l�ve
-			 *une exception si l'entr�e n'est pas correcte.*/
+			/*On ajoute un test d'intersection qui lève
+			 *une exception si l'entrée n'est pas correcte.*/
 			checkForIntersection();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -44,7 +46,7 @@ public class RushHour {
 		}
 	}
 
-
+	//checks for intersections between vehicules
 	private void checkForIntersection() throws Intersection {
 		int[][] grid = new int[this.gridSize][this.gridSize];
 		for (Vehicule v : this.vehicules) {
@@ -52,16 +54,16 @@ public class RushHour {
 			for (int[]pos :tiles) {
 				if (grid[pos[0]][pos[1]]==1) {
 					throw (new Intersection());
-					//On s'arr�te si la case a d�j� �t� remplie.
+					//On s'arrete si la case a deja ete remplie.
 				}
 				grid[pos[0]][pos[1]] = 1;
 			}
 		}
-
+		//check if a vehicule is off the grid ?
 	}
 
-
-	void process(LinkedList<Vehicule> vehicules, String vehicule) {
+	//appends 'vehicule' to the list 'vehicules'
+	void append(LinkedList<Vehicule> vehicules, String vehicule) {
 		String[] str = vehicule.split(" ");
 		int id = Integer.parseInt(str[0]);
 		char ori = str[1].charAt(0);
@@ -71,13 +73,18 @@ public class RushHour {
 		vehicules.add(new Vehicule(id, ori, size, i, j));
 	}
 
+	//displays the grid
 	public void display() {
 		int[][] grid = new int[this.gridSize][this.gridSize];
+
+		//fills the grid with zeroes
 		for (int i=0; i<this.gridSize; i++) {
 			for (int j=0; j<this.gridSize; j++) {
 				grid[i][j]=0;
 			}
 		}
+
+		//for each vehicules, fills the tiles occupied with the vehicule's id.
 		for (Vehicule v : this.vehicules) {
 			int i = v.id;
 			LinkedList<int[]> tiles = v.tiles();
@@ -85,6 +92,8 @@ public class RushHour {
 				grid[pos[0]][pos[1]] = i;
 			}
 		}
+
+		//prints the grid (blank for zeroes, id else)
 		for (int i=0; i<this.gridSize; i++) {
 			for (int j=0; j<this.gridSize; j++) {
 				if (grid[i][j]==0) {
