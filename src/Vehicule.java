@@ -30,6 +30,11 @@ public class Vehicule {
 				res.add(new int[] {i,k});
 			}
 		}
+		else {
+			for (int k=i; k<i+size; k++) {
+				res.add(new int[] {k,j});
+			}
+		}
 		return res;
 	}
 
