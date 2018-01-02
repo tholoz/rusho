@@ -37,7 +37,7 @@ public class Vehicule {
 	}
 
 	LinkedList<int[]> tiles(){
-		/* permet d'obtenir les cases (a partir de zero) qu'occupe le véhicule
+		/* permet d'obtenir les cases (a partir de zero) qu'occupe le vÃ©hicule
 		 * sous forme d'une liste.*/
 		LinkedList<int[]> res = new LinkedList<int[]>();
 		int i = pos[1]-1;//the i^th line is the ordinate (y) minus 1 (starts at zero)

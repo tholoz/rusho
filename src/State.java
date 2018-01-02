@@ -56,7 +56,7 @@ public class State {
 					//On s'arrête si la case a déjà été remplie.
 				}
 				grid[pos[0]][pos[1]] = v.getId();
-			
+
 			}
 		}
 		
