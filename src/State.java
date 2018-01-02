@@ -55,10 +55,7 @@ public class State {
 					throw (new Intersection());
 					//On s'arrête si la case a déjà été remplie.
 				}
-				grid[pos[0]][pos[1]] = v.getId();
-				System.out.println(v.getId());
-				System.out.println(""+ pos[0]+ " " + pos[1]);
-				
+				grid[pos[0]][pos[1]] = v.getId();		
 			}
 		}
 		
