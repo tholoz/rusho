@@ -7,8 +7,9 @@ public class Vehicule {
 	private int ori;
 	private int size;
 	private int[] pos;
+	private int gridSize;//stores the grid size to be able to create a State with only a list of Vehicles
 
-	Vehicule(int id, char orientation, int size, int i, int j){
+	Vehicule(int id, char orientation, int size, int i, int j, int gridSize){
 		this.id = id;
 		this.size = size;
 		if (orientation=='h') {
@@ -17,9 +18,10 @@ public class Vehicule {
 		else ori = 1;
 
 		pos = new int[] {i,j};
+		this.gridSize = gridSize;
 	}
 	
-	//getters
+	//getters & setters
 	public int getId(){
 		return id;
 	}
@@ -35,7 +37,15 @@ public class Vehicule {
 	public int[] getPos(){
 		return pos;
 	}
+	
+	public int getGridSize(){
+		return gridSize;
+	}
 
+	public void setPos(int[] pos){
+		this.pos = pos;
+	}
+	
 	LinkedList<int[]> tiles(){
 		/* permet d'obtenir les cases (a partir de zero) qu'occupe le vÃ©hicule
 		 * sous forme d'une liste.*/
