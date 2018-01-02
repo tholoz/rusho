@@ -19,12 +19,7 @@ public class State {
 	Vehicule mainVehicule;
 	Vehicule[] vehicules;
 	
-	public RushHour() {
-		
-	}
-	
-	
-	public void init (File f) {
+	public State (File f) {
 		BufferedReader br;
 		try {
 			br = new BufferedReader(new FileReader(f.getAbsolutePath()));
@@ -61,6 +56,9 @@ public class State {
 					//On s'arrête si la case a déjà été remplie.
 				}
 				grid[pos[0]][pos[1]] = v.getId();
+				System.out.println(v.getId());
+				System.out.println(""+ pos[0]+ " " + pos[1]);
+				
 			}
 		}
 		
