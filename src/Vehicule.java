@@ -37,19 +37,19 @@ public class Vehicule {
 	}
 
 	LinkedList<int[]> tiles(){
-		/* permet d'obtenir les cases (a partir de zero) qu'occupe le véhicule
+		/* permet d'obtenir les cases (a partir de zero) qu'occupe le vÃ©hicule
 		 * sous forme d'une liste.*/
 		LinkedList<int[]> res = new LinkedList<int[]>();
-		int i = pos[0]-1;
-		int j = pos[1]-1;
+		int i = pos[1]-1;//the i^th line is the ordinate (y) minus 1 (starts at zero)
+		int j = pos[0]-1;//the j^th column is the absciss (x) minus 1
 		if (ori==0) {
 			for (int k=j; k<j+size; k++) {
-				res.add(new int[] {i,k});
+				res.add(new int[] {i,k});//the line is constant (horizontal)
 			}
 		}
 		else {
 			for (int k=i; k<i+size; k++) {
-				res.add(new int[] {k,j});
+				res.add(new int[] {k,j});//the column is constant (vertical)
 			}
 		}
 		return res;
