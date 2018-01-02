@@ -123,6 +123,7 @@ public class State {
 
 
 	public int[][] getPositions() {
+		//returns a two-column array (x,y coordinates) with a line by vehicle
 		int [][] res = new int[num][2];
 		for (int i=0; i<num; i++) {
 			res[i] = vehicules[i].getPos();
