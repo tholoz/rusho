@@ -47,8 +47,8 @@ public class Vehicule {
 	}
 	
 	LinkedList<int[]> tiles(){
-		/* permet d'obtenir les cases (a partir de zero) qu'occupe le vÃ©hicule
-		 * sous forme d'une liste.*/
+		/* returns a list containing the tiles occupied by the vehicle
+		*/
 		LinkedList<int[]> res = new LinkedList<int[]>();
 		int i = pos[1]-1;//the i^th line is the ordinate (y) minus 1 (starts at zero)
 		int j = pos[0]-1;//the j^th column is the absciss (x) minus 1
@@ -63,6 +63,19 @@ public class Vehicule {
 			}
 		}
 		return res;
+	}
+	
+	public int blocking(int[] position) {
+		int i = position[0];
+		int j = position[1];
+		for (int[] pos: tiles()) {
+			int x = pos[1];
+			int y = pos[0];
+			if (y==j-1 && i-1<x) {
+				return 1;
+			}
+		}
+		return 0;
 	}
 
 }

@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class State {
+public class State implements Comparable{
 	
 	@SuppressWarnings("serial")
 	class InvalidStateException extends Exception{
@@ -16,6 +16,8 @@ public class State {
 	int num;
 	Vehicule mainVehicule;
 	Vehicule[] vehicules;
+	int vehiclesToExit;
+	int statesFromInit;
 	
 	public State (File f) {
 		/*
@@ -46,6 +48,8 @@ public class State {
 			i.printStackTrace();
 			System.out.println("The input file is invalid: some vehicles intersect or are out of the grid.");
 		}
+		vehiclesToExit = vehiclesToExit();
+		statesFromInit = 0;
 	}
 	
 	public State (Vehicule[] vehicles){
@@ -59,10 +63,18 @@ public class State {
 		
 	}
 	
+	public State (Vehicule[] vehicles, int vehiclesToExit) {
+		//Used for heuristical algorithm
+		this.gridSize = vehicles[0].getGridSize();
+		this.num = vehicles.length;
+		this.vehicules = vehicles;
+		this.vehiclesToExit = vehiclesToExit;
+	}
+	
 
 	private void checkForInvalidity() throws InvalidStateException {
 		/*
-		 * Throws an exception iif the state is invalid (overlapping vehicles or vehicles out of the grid
+		 * Throws an exception if the state is invalid (overlapping vehicles or vehicles out of the grid
 		 */
 		
 		int[][] grid = new int[this.gridSize][this.gridSize];
@@ -76,7 +88,7 @@ public class State {
 				
 				if (grid[pos[0]][pos[1]]>0) {
 					throw (new InvalidStateException());
-					//On s'arrête si la case a déjà été remplie.
+					//We stop if the tile is already filled
 				}
 				grid[pos[0]][pos[1]] = v.getId();
 
@@ -202,22 +214,22 @@ public class State {
 		 */
 		
 		Vehicule redCar = vehicules[0];
-		int[][] grid = this.toGrid();
-		int x = redCar.getPos()[0];
+		//int[][] grid = this.toGrid();
+		//int x = redCar.getPos()[0];
 		int y = redCar.getPos()[1];
 		
 		if (y != (this.gridSize/2)){
 			//check if the red car is on the right line
 			return false;
 		}
-		for (int X = x + redCar.getSize(); X<= this.gridSize; X++ ){
+		//for (int X = x + redCar.getSize(); X<= this.gridSize; X++ ){
 			//check that there is no car between the red car and the exit
-			if (grid[y-1][X-1] != 0){
-				return false;
-			}
-		}
+		//	if (grid[y-1][X-1] != 0){
+		//		return false;
+		//	}
+		//}
 		
-		return true;
+		return vehiclesToExit==0;
 		
 	}
 	
@@ -252,7 +264,8 @@ public class State {
 					Vehicule[] testVehicles = vehicules.clone();//this is not a deep copy
 					Vehicule movedVehicle = new Vehicule(id,'h',size,pos[0]+k,pos[1],gridSize);//...then we create a new vehicle, leaving the older state unchanged
 					testVehicles[id -1] = movedVehicle;		
-					State testState = new State(testVehicles);//potentially invalid
+					int toExit = vehiclesToExit + updateToExit(movingVehicle, movedVehicle);
+					State testState = new State(testVehicles, toExit);//potentially invalid
 										
 					try{
 						testState.checkForInvalidity();
@@ -278,8 +291,9 @@ public class State {
 				while (validState) {
 					Vehicule[] testVehicles = vehicules.clone();//this is not a deep copy
 					Vehicule movedVehicle = new Vehicule(id,'h',size,pos[0]+k,pos[1],gridSize);//...then we create a new vehicle, leaving the older state unchanged
-					testVehicles[id -1] = movedVehicle;		
-					State testState = new State(testVehicles);
+					testVehicles[id -1] = movedVehicle;
+					int toExit = vehiclesToExit + updateToExit(movingVehicle, movedVehicle);
+					State testState = new State(testVehicles, toExit);
 					try{
 						testState.checkForInvalidity();
 						//continue if the state is valid (else goto catch)
@@ -310,8 +324,9 @@ public class State {
 				while (validState) {
 					Vehicule[] testVehicles = vehicules.clone();//this is not a deep copy
 					Vehicule movedVehicle = new Vehicule(id,'v',size,pos[0],pos[1]+k,gridSize);//...then we create a new vehicle, leaving the older state unchanged
-					testVehicles[id -1] = movedVehicle;		
-					State testState = new State(testVehicles);
+					testVehicles[id -1] = movedVehicle;
+					int toExit = vehiclesToExit + updateToExit(movingVehicle, movedVehicle);
+					State testState = new State(testVehicles, toExit);
 					
 					try{
 						testState.checkForInvalidity();
@@ -338,8 +353,9 @@ public class State {
 				while (validState) {
 					Vehicule[] testVehicles = vehicules.clone();//this is not a deep copy
 					Vehicule movedVehicle = new Vehicule(id,'v',size,pos[0],pos[1]+k,gridSize);//...then we create a new vehicle, leaving the older state unchanged
-					testVehicles[id -1] = movedVehicle;		
-					State testState = new State(testVehicles);
+					testVehicles[id -1] = movedVehicle;
+					int toExit = vehiclesToExit + updateToExit(movingVehicle, movedVehicle);
+					State testState = new State(testVehicles, toExit);
 					try{
 						testState.checkForInvalidity();
 						//continue if the state is valid (else goto catch)
@@ -364,6 +380,37 @@ public class State {
 		}
 		
 		return states;
+	}
+	
+	
+	private int updateToExit(Vehicule prev, Vehicule after) {
+		if (prev.getId()==1) {
+			return 0;
+		}
+		else{
+			return after.blocking(vehicules[0].getPos())-prev.blocking(vehicules[0].getPos());
+		}
+	}
+
+	public int vehiclesToExit() {
+		//gives the amount of vehicles between the main vehicle and the exit.
+		int[][] grid = this.toGrid();
+		LinkedList<Integer> seen = new LinkedList<Integer>();
+		mainVehicule = vehicules[0]; 
+		int i = mainVehicule.getPos()[1];
+		for (int j = mainVehicule.getPos()[0]; j<=mainVehicule.getGridSize(); j++) {
+			int k = grid[i-1][j-1];
+			if (k>1 && !seen.contains(k)) {
+				seen.add(k);
+			}
+		}
+		return seen.size();
+	}
+
+	@Override
+	public int compareTo(Object o) {
+		State s = (State) o;
+		return (this.vehiclesToExit+this.statesFromInit-s.vehiclesToExit-s.statesFromInit);
 	}
 	
 	
