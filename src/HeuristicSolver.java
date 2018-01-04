@@ -10,7 +10,7 @@ public class HeuristicSolver {
 	private PriorityQueue<State> toVisit;
 	private int length = 1;
 	
-	public HeuristicSolver (State initialState) {
+	public HeuristicSolver (State initialState, Heuristic h) {
 		/*
 		 * Initializes a solver with an initial state
 		 */
@@ -18,7 +18,7 @@ public class HeuristicSolver {
 		this.initialState = initialState;
 		reachedStates = new HashMap<State,Move>();
 		reachedStates.put(initialState, null);
-		toVisit = new PriorityQueue<State>();
+		toVisit = new PriorityQueue<State>(new StateComparator(h));
 		toVisit.add(initialState);
 	}
 	

@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class State implements Comparable{
+public class State{
 	
 	@SuppressWarnings("serial")
 	class InvalidStateException extends Exception{
@@ -406,12 +406,17 @@ public class State implements Comparable{
 		}
 		return seen.size();
 	}
+	
+	public int distanceToExit() {
+		return gridSize-(vehicules[0].getPos())[0];
+	}
 
+	/*
 	@Override
 	public int compareTo(Object o) {
 		State s = (State) o;
 		return (this.vehiclesToExit+this.statesFromInit-s.vehiclesToExit-s.statesFromInit);
 	}
-	
+	*/
 	
 }
