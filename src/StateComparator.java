@@ -17,8 +17,11 @@ public class StateComparator implements Comparator<State>{
 				return (s0.statesFromInit+s0.vehiclesToExit)-(s1.statesFromInit+s1.vehiclesToExit);
 			case DistanceToExit:
 				return (s0.statesFromInit+s0.distanceToExit())-(s1.statesFromInit+s1.distanceToExit());
+			case BlockingVehiclesImproved :
+				return (s0.statesFromInit+s0.vehiclesToExit+s0.blockedBlockingVehicles())-(s1.statesFromInit+s1.vehiclesToExit+s0.blockedBlockingVehicles());
 		}
 		return 0;
 	}
+
 
 }

@@ -1,4 +1,7 @@
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 
 
 
@@ -8,10 +11,10 @@ public class RushHourTest {
 		//State test1 = new State(new File("D:/Cours/Java/rusho-master/test/GameP10.txt"));
 		//test1.display();
 		//BruteForceSolver solver = new BruteForceSolver(test1);
-		//HeuristicSolver solver = new HeuristicSolver(test1);
+		//HeuristicSolver solver = new HeuristicSolver(test1, Heuristic.BlockingVehiclesImproved);
 		//solver.solve();
 		//solver.displaySolution();
-		timeTest(new File("D:/Cours/Java/rusho-master/test/GameP30.txt"), 50);
+		allGamesTimeTest(10, Heuristic.BlockingVehiclesImproved);
 		
 	}
 	
@@ -35,6 +38,33 @@ public class RushHourTest {
 		hsolver.solve();
 		hsolver.displaySolution();
 		System.out.println("Processing time for "+ times + " attempts using HeuristicSolver : "+(System.currentTimeMillis()-top)+"ms.");
+	}
+	
+	public static void allGamesTimeTest(int times, Heuristic h) {
+		try {
+			FileWriter dos = new FileWriter(new File(h.toString()+"test.txt"));
+			for(int k=0; k<4; k++) {
+				for (int j=0; j<10; j++) {
+					String fileName = "GameP"+k+j+".txt";
+					State test = new State(new File("D:/Cours/Java/rusho-master/test/"+fileName));
+					double top = System.currentTimeMillis();
+					for (int i=1; i<times; i++) {
+						HeuristicSolver hsolver = new HeuristicSolver(test, Heuristic.BlockingVehicles);
+						hsolver.solve();
+					}
+					double time = System.currentTimeMillis()-top;
+					dos.write(Integer.toString((int)time));
+					dos.write("\n");
+				}
+			}
+			
+			dos.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }

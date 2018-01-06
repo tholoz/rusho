@@ -17,6 +17,7 @@ public class State{
 	Vehicule mainVehicule;
 	Vehicule[] vehicules;
 	int vehiclesToExit;
+	LinkedList<Integer> listVehiclesToExit;
 	int statesFromInit;
 	
 	public State (File f) {
@@ -48,7 +49,8 @@ public class State{
 			i.printStackTrace();
 			System.out.println("The input file is invalid: some vehicles intersect or are out of the grid.");
 		}
-		vehiclesToExit = vehiclesToExit();
+		listVehiclesToExit = vehiclesToExit();
+		vehiclesToExit = listVehiclesToExit.size();
 		statesFromInit = 0;
 	}
 	
@@ -63,12 +65,13 @@ public class State{
 		
 	}
 	
-	public State (Vehicule[] vehicles, int vehiclesToExit) {
+	public State (Vehicule[] vehicles, int vehiclesToExit, LinkedList<Integer> listVehiclesToExit) {
 		//Used for heuristical algorithm
 		this.gridSize = vehicles[0].getGridSize();
 		this.num = vehicles.length;
 		this.vehicules = vehicles;
 		this.vehiclesToExit = vehiclesToExit;
+		this.listVehiclesToExit = listVehiclesToExit;
 	}
 	
 
@@ -265,13 +268,15 @@ public class State{
 					Vehicule movedVehicle = new Vehicule(id,'h',size,pos[0]+k,pos[1],gridSize);//...then we create a new vehicle, leaving the older state unchanged
 					testVehicles[id -1] = movedVehicle;		
 					int toExit = vehiclesToExit + updateToExit(movingVehicle, movedVehicle);
-					State testState = new State(testVehicles, toExit);//potentially invalid
+					LinkedList<Integer> list = new LinkedList<Integer>(listVehiclesToExit);
+					State testState = new State(testVehicles, toExit, list);//potentially invalid
 										
 					try{
 						testState.checkForInvalidity();
 						//continue if the state is valid (else goto catch)
 						//and if it is also new we add it
 						if (reachedStates.containsKey(testState) == false){
+							testState.updateVehiclesToExit(movingVehicle, movedVehicle);
 							states.add(testState);
 							Move nextMove = new Move(id,0,k,previousMove);
 							reachedStates.put(testState, nextMove);
@@ -293,12 +298,16 @@ public class State{
 					Vehicule movedVehicle = new Vehicule(id,'h',size,pos[0]+k,pos[1],gridSize);//...then we create a new vehicle, leaving the older state unchanged
 					testVehicles[id -1] = movedVehicle;
 					int toExit = vehiclesToExit + updateToExit(movingVehicle, movedVehicle);
-					State testState = new State(testVehicles, toExit);
+					LinkedList<Integer> list = new LinkedList<Integer>(listVehiclesToExit);
+					State testState = new State(testVehicles, toExit, list);
+					testState.updateVehiclesToExit(movingVehicle, movedVehicle);
+					
 					try{
 						testState.checkForInvalidity();
 						//continue if the state is valid (else goto catch)
 						//and if it is also new we add it
 						if (reachedStates.containsKey(testState) == false){
+							testState.updateVehiclesToExit(movingVehicle, movedVehicle);
 							states.add(testState);
 							Move nextMove = new Move(id,0,k,previousMove);
 							reachedStates.put(testState, nextMove);
@@ -326,13 +335,16 @@ public class State{
 					Vehicule movedVehicle = new Vehicule(id,'v',size,pos[0],pos[1]+k,gridSize);//...then we create a new vehicle, leaving the older state unchanged
 					testVehicles[id -1] = movedVehicle;
 					int toExit = vehiclesToExit + updateToExit(movingVehicle, movedVehicle);
-					State testState = new State(testVehicles, toExit);
+					LinkedList<Integer> list = new LinkedList<Integer>(listVehiclesToExit);
+					State testState = new State(testVehicles, toExit, list);
+					testState.updateVehiclesToExit(movingVehicle, movedVehicle);
 					
 					try{
 						testState.checkForInvalidity();
 						//continue if the state is valid (else goto catch)
 						//and if it is also new we add it
 						if (reachedStates.containsKey(testState) == false){
+							testState.updateVehiclesToExit(movingVehicle, movedVehicle);
 							states.add(testState);
 							Move nextMove = new Move(id,1,k,previousMove);
 							reachedStates.put(testState, nextMove);
@@ -355,7 +367,9 @@ public class State{
 					Vehicule movedVehicle = new Vehicule(id,'v',size,pos[0],pos[1]+k,gridSize);//...then we create a new vehicle, leaving the older state unchanged
 					testVehicles[id -1] = movedVehicle;
 					int toExit = vehiclesToExit + updateToExit(movingVehicle, movedVehicle);
-					State testState = new State(testVehicles, toExit);
+					LinkedList<Integer> list = new LinkedList<Integer>(listVehiclesToExit);
+					State testState = new State(testVehicles, toExit, list);
+					testState.updateVehiclesToExit(movingVehicle, movedVehicle);
 					try{
 						testState.checkForInvalidity();
 						//continue if the state is valid (else goto catch)
@@ -382,6 +396,17 @@ public class State{
 		return states;
 	}
 	
+	private void updateVehiclesToExit(Vehicule prev, Vehicule after) {
+		if (prev.getId()==1) {
+			return;
+		}
+		int n = after.blocking(vehicules[0].getPos())-prev.blocking(vehicules[0].getPos());
+		switch (n) {
+		case (-1) : listVehiclesToExit.removeFirstOccurrence(prev.getId());
+		case (1) : listVehiclesToExit.add(prev.getId());
+		default :
+		}
+	}
 	
 	private int updateToExit(Vehicule prev, Vehicule after) {
 		if (prev.getId()==1) {
@@ -392,7 +417,7 @@ public class State{
 		}
 	}
 
-	public int vehiclesToExit() {
+	public LinkedList<Integer> vehiclesToExit() {
 		//gives the amount of vehicles between the main vehicle and the exit.
 		int[][] grid = this.toGrid();
 		LinkedList<Integer> seen = new LinkedList<Integer>();
@@ -404,19 +429,32 @@ public class State{
 				seen.add(k);
 			}
 		}
-		return seen.size();
+		return seen;
 	}
 	
 	public int distanceToExit() {
 		return gridSize-(vehicules[0].getPos())[0];
 	}
 
-	/*
-	@Override
-	public int compareTo(Object o) {
-		State s = (State) o;
-		return (this.vehiclesToExit+this.statesFromInit-s.vehiclesToExit-s.statesFromInit);
+	public int blockedBlockingVehicles() {
+		int[][] grid = this.toGrid();
+		int n = 0;
+		for (int id:listVehiclesToExit) {
+			if (isBlocked(id, grid)) {
+				n++;
+			}
+		}
+		return n;
 	}
-	*/
+
+	private boolean isBlocked(int id, int[][] grid) {
+		int x = vehicules[id-1].getPos()[0]-1;
+		if(vehicules[id-1].getSize()==2) {
+			return !((((grid[x][0]==0)||(grid[x][0]==id))&&((grid[x][1]==0)||(grid[x][1]==id)))||
+					(((grid[x][3]==0)||(grid[x][3]==id))&&((grid[x][4]==0)||(grid[x][4]==id))));
+		}
+		return !(((grid[x][3]==0)||(grid[x][3]==id))&&((grid[x][4]==0)||(grid[x][4]==id))&&((grid[x][5]==0)||(grid[x][5]==id)));
+	}
+
 	
 }

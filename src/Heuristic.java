@@ -1,5 +1,5 @@
 
 public enum Heuristic {
-	Null, BlockingVehicles, DistanceToExit
+	Null, BlockingVehicles, DistanceToExit, BlockingVehiclesImproved
 
 }
