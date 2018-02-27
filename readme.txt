@@ -1,1 +1,1 @@
-Try to run the RushHourTest main on different txt files, with different solvers!
+Try to run the RushHourTest main on different txt files with different solvers!
